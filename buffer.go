@@ -52,7 +52,7 @@ func (c *HistoryBuffer) Read(p []byte) (int, error) {
 	return read, nil
 }
 
-// New takes a size of the buffer to create and returns a pointer to the new Circular Buffer.
+// New takes a size of the buffer to create and returns a pointer to the new History Buffer.
 func New(size int) *HistoryBuffer {
 	return &HistoryBuffer{
 		buf:  make([]byte, size),
