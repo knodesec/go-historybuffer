@@ -40,7 +40,7 @@ func main() {
     }
     log.Printf("Wrote %d bytes to history buffer\n", written)
 
-    // Read the full 5 btyes buffer
+    // Read the full 5 bytes buffer
     readOut := make([]byte, 5)
     read, err := history.Read(readOut)
     if err != nil {
