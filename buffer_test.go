@@ -88,14 +88,16 @@ func TestReadBasic(t *testing.T) {
 		data         []byte
 		forcehead    int
 		forcetail    int
+		forcewritten bool
 		expecteddata []byte
 		expectederr  error
 		expectedsize int
 	}{
-		{"valid-read-1", 1, []byte{0x01}, 0, 0, []byte{0x01}, nil, 1},
-		{"valid-read-2", 2, []byte{0x01, 0x02}, 0, 1, []byte{0x01, 0x02}, nil, 2},
-		{"valid-read-3", 5, []byte{0x01, 0x02, 0x03, 0x04, 0x05}, 1, 0, []byte{0x02, 0x03, 0x04, 0x05, 0x01}, nil, 5},
-		{"valid-read-3", 5, []byte{0x01, 0x02, 0x03, 0x04, 0x05}, 2, 1, []byte{0x03, 0x04, 0x05, 0x01, 0x02}, nil, 5},
+		{"valid-read-1", 1, []byte{0x01}, 0, 0, true, []byte{0x01}, nil, 1},
+		{"valid-read-2", 2, []byte{0x01, 0x02}, 0, 1, true, []byte{0x01, 0x02}, nil, 2},
+		{"valid-read-3", 5, []byte{0x01, 0x02, 0x03, 0x04, 0x05}, 1, 0, true, []byte{0x02, 0x03, 0x04, 0x05, 0x01}, nil, 5},
+		{"valid-read-3", 5, []byte{0x01, 0x02, 0x03, 0x04, 0x05}, 2, 1, true, []byte{0x03, 0x04, 0x05, 0x01, 0x02}, nil, 5},
+		{"read-empty", 1, []byte{}, 0, 0, false, []byte{}, ErrEmpty, 0},
 	}
 
 	for _, tt := range tests {
@@ -107,11 +109,12 @@ func TestReadBasic(t *testing.T) {
 			testBuf.head = tt.forcehead
 			testBuf.tail = tt.forcetail
 			testBuf.buf = tt.data
+			testBuf.written = tt.forcewritten
 			readOut := make([]byte, tt.expectedsize)
 			readSize, err := testBuf.Read(readOut)
 
 			if tt.expectederr != err {
-				t.Errorf("expected err %T, got %T", tt.expectederr, err)
+				t.Errorf("expected err %T, got %s", tt.expectederr, err.Error())
 				return
 			}
 
@@ -120,10 +123,16 @@ func TestReadBasic(t *testing.T) {
 				return
 			}
 
+			// skip tests where we expect an error
+			if tt.expectederr != nil {
+				return
+			}
+
 			if len(readOut) != len(tt.expecteddata) {
 				t.Errorf("expected buf len %d, got %d", len(tt.expecteddata), len(readOut))
 				return
 			}
+
 			for i, b := range tt.expecteddata {
 				if readOut[i] != b {
 					t.Errorf("reading byte %d expected %#v, got %#v", i, b, readOut[i])

@@ -1,17 +1,22 @@
 package historybuf
 
 import (
+	"errors"
 	"sync"
+)
+
+var (
+	ErrEmpty = errors.New("history buffer was empty")
 )
 
 // HistoryBuffer struct to track the buffer, head and tail pointers, and provide a mutex for safe concurrent access
 type HistoryBuffer struct {
-	buf    []byte
-	size   int
-	head   int
-	tail   int
-	filled bool
-	mu     sync.Mutex
+	buf     []byte
+	size    int
+	head    int
+	tail    int
+	written bool
+	mu      sync.Mutex
 }
 
 // Write implements a naive write, iterating over the incoming bytes and writing them to the buffer.
@@ -19,6 +24,7 @@ type HistoryBuffer struct {
 // The current implementation will continiously write round the buffer on over-size writes, by design.
 func (c *HistoryBuffer) Write(data []byte) (int, error) {
 
+	c.written = true
 	for _, b := range data {
 		c.tail = (c.tail + 1) % c.size
 
@@ -35,8 +41,8 @@ func (c *HistoryBuffer) Write(data []byte) (int, error) {
 // Note this will not increment the head. This design allows the buffer to be used as a "historical log" as such.
 func (c *HistoryBuffer) Read(p []byte) (int, error) {
 
-	if c.head == c.tail {
-		return 0, nil
+	if c.head == c.tail && c.written == false {
+		return 0, ErrEmpty
 	}
 
 	readPos := c.head
