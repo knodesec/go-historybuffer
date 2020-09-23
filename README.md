@@ -1,6 +1,7 @@
 # History Buffer
 History buffer is based on a circular buffer, but without reads changing the head pointer. This allows for a historical log of *n* bytes to be retrieved by the consumer at any point. This has a fairly narrow use case, as bytes are often only important in context.
-
+  
+This package is currently not safe for concurrent use.
 #### Installation
 ```
 go get -v github.com/knodesec/go-historybuffer
