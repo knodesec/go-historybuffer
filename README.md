@@ -70,7 +70,7 @@ func main() {
 
 The output from the above looks like the following
 ```
-Wrote 5 bytes to hsitory buffer
+Wrote 5 bytes to history buffer
 Read 5 bytes from the history buffer
 [1 2 3 4 5]
 Wrote a further 2 bytes
