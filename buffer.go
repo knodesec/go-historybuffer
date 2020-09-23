@@ -35,6 +35,10 @@ func (c *HistoryBuffer) Write(data []byte) (int, error) {
 // Note this will not increment the head. This design allows the buffer to be used as a "historical log" as such.
 func (c *HistoryBuffer) Read(p []byte) (int, error) {
 
+	if c.head == c.tail {
+		return 0, nil
+	}
+
 	readPos := c.head
 	read := 0
 	readTemp := make([]byte, c.size)
