@@ -31,15 +31,6 @@ func (c *HistoryBuffer) Write(data []byte) (int, error) {
 	return len(data), nil
 }
 
-// New takes a size of the buffer to create and returns a pointer to the new Circular Buffer.
-func New(size int) *HistoryBuffer {
-	return &HistoryBuffer{
-		buf:  make([]byte, size),
-		size: size,
-		tail: -1,
-	}
-}
-
 // Read will read the full data from the head to tail of the buffer, returning the length of data read.
 // Note this will not increment the head. This design allows the buffer to be used as a "historical log" as such.
 func (c *HistoryBuffer) Read(p []byte) (int, error) {
@@ -59,4 +50,13 @@ func (c *HistoryBuffer) Read(p []byte) (int, error) {
 	copy(p, readTemp)
 
 	return read, nil
+}
+
+// New takes a size of the buffer to create and returns a pointer to the new Circular Buffer.
+func New(size int) *HistoryBuffer {
+	return &HistoryBuffer{
+		buf:  make([]byte, size),
+		size: size,
+		tail: -1,
+	}
 }
